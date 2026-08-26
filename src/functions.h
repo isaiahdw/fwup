@@ -19,6 +19,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <confuse.h>
 #include "uboot_env.h"
@@ -66,7 +67,7 @@ struct fun_context {
     // Delta update processing (NULL if not in use)
     struct xdelta_state *xd;
     off_t xd_source_offset;
-    size_t xd_source_count;
+    int64_t xd_source_count;
     const char *xd_source_path;
     struct disk_crypto *xd_source_dc;
 

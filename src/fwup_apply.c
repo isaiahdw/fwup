@@ -249,11 +249,11 @@ static int xdelta_read_source_callback(void *cookie, void *buf, size_t count, of
 
     if (offset < 0 ||
         offset > fctx->xd_source_count)
-        ERR_RETURN("xdelta tried to load outside of allowed byte range (0-%zu): offset: %" PRId64 ", count: %zu", fctx->xd_source_count, offset, count);
+        ERR_RETURN("xdelta tried to load outside of allowed byte range (0-%" PRId64 "): offset: %" PRId64 ", count: %zu", fctx->xd_source_count, (int64_t) offset, count);
 
-    if (count > fctx->xd_source_count ||
-        offset > fctx->xd_source_count - count)
-        count = fctx->xd_source_count - offset;
+    if ((int64_t) count > fctx->xd_source_count ||
+        (int64_t) offset > fctx->xd_source_count - (int64_t) count)
+        count = (size_t) (fctx->xd_source_count - (int64_t) offset);
 
     // NOTE: Decryption is now handled by block_cache_set_decrypt(), so the cache
     // contains decrypted data. This eliminates redundant decryption on cache hits.
@@ -413,7 +413,7 @@ static int run_task(struct fun_context *fctx, struct fwup_apply_data *pd)
         if (pd->sfm.map_len == 1 && archive_entry_size_is_set(ae) && size_in_archive != expected_size_in_archive) {
             // Size in archive is different from expected size
             const char *source_raw_offset_str = cfg_getstr(on_resource, "delta-source-raw-offset");
-            int source_raw_count = cfg_getint(on_resource, "delta-source-raw-count");
+            int64_t source_raw_count = cfg_getint(on_resource, "delta-source-raw-count");
 
             const char *source_fat_offset_str = cfg_getstr(on_resource, "delta-source-fat-offset");
             const char *source_fat_path = cfg_getstr(on_resource, "delta-source-fat-path");
